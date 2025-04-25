@@ -1,0 +1,40 @@
+version: "3.0"
+services:
+  limesurvey:
+    build:
+      context: 6.0/fpm/
+      dockerfile: Dockerfile.sqlsrv
+    volumes:
+      # Hint: This is just an example, change /tmp to something persistent
+      - /tmp/upload/surveys:/var/www/html/upload/surveys
+      - lime:/var/www/html
+    environment:
+      - "DB_HOST=10.1.34.3"
+      # TODO set passwords
+      - "DB_TYPE=sqlsrv"
+      - "DB_USERNAME=sa"
+      - "DB_PASSWORD=SA@uni!$02"
+      - "DB_NAME=LimeSurvey"
+      # LimeSurveyDb"
+      - "ADMIN_PASSWORD=admin"
+      # If you require an empty table prefix, use a space as the DB_TABLE_PREFIX
+      - "DB_TABLE_PREFIX=lime_"
+      - "ADMIN_EMAIL=test@example.com"
+  lime-web:
+    image: docker.io/nginx
+    links:
+      - limesurvey
+    ports:
+      - "8080:80"
+    volumes:
+      - ./examples/nginx.conf:/etc/nginx/nginx.conf:ro
+      - lime:/var/www/html
+  # lime-db:
+  #   image: docker.io/mysql:5.7
+  #   environment:
+  #     - "MYSQL_USER=limesurvey"
+  #     - "MYSQL_DATABASE=limesurvey"
+  #     # - "MYSQL_PASSWORD="
+  #     # - "MYSQL_ROOT_PASSWORD="
+volumes:
+  lime:
